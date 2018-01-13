@@ -73,5 +73,6 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.Handle("/lists", api.ListHandler{DB: db})
+	mux.Handle("/lists", api.List{})
 	http.ListenAndServe(":8080", mux)
 }

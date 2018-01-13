@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/AMFDPMTE/list-api/utils"
 )
 
 type List struct {
@@ -23,6 +25,14 @@ type ListHandler struct {
 }
 
 func (l ListHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		l.list(w, r)
+	} else {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+	}
+}
+
+func (l ListHandler) list(w http.ResponseWriter, r *http.Request) {
 	rows, err := l.DB.Query(`
   SELECT id, name, slug, list, description, created_at, updated_at
   FROM lists
@@ -46,6 +56,7 @@ func (l ListHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		lists = append(lists, l)
 	}
 
+	w.Header().Add(utils.HTTPHeaderContentType, utils.MimeJSON)
 	data, err := json.Marshal(lists)
 	if err != nil {
 		fmt.Println(err)
